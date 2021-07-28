@@ -1,5 +1,7 @@
 package com.yzt.sms.config;
 
+
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.yzt.sms.entity.SmsChannel;
@@ -7,6 +9,7 @@ import com.yzt.sms.entity.SmsMessage;
 import com.yzt.sms.service.SmsChannelService;
 import com.yzt.sms.service.SmsMsgService;
 import com.yzt.sms.utils.DesUtils;
+import com.yzt.sms.vo.GetMsgListVo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,6 +18,7 @@ import javax.websocket.*;
 import javax.websocket.server.PathParam;
 import javax.websocket.server.ServerEndpoint;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -89,16 +93,18 @@ public class WebSocketServer {
         log.info("通道退出:"+ channelToken +",当前在线人数为:" + getOnlineCount());
     }
 
-    /**
-     * 收到客户端消息后调用的方法
-     *
-     * @param channelToken 客户端发送过来的消息*/
+
     @OnMessage
-    public void onMessage(String channelToken, Session session) throws EncodeException, IOException {
+    public void onMessage(String getMsgListVoString, Session session) throws EncodeException, IOException {
         log.info("通道消息:"+ this.channelToken +",入参消息通道:"+channelToken);
 
-        //发送消息
-        if (this.channelToken.equals(channelToken)){
+//        JSONObject jsonObject=JSONObject.fromObject(objectStr);
+//        Student stu=(Student)JSONObject.toBean(jsonObject, Student.class);
+        GetMsgListVo getMsgListVo = JSON.parseObject(getMsgListVoString, GetMsgListVo.class);
+        if (getMsgListVo.isHeartBeat()){
+            webSocketMap.get(channelToken).sendMessage(getMsgListVoString);
+        }else if (this.channelToken.equals(getMsgListVo.getChannelToken())){
+            //发送消息
             SmsMessage smsMessage = new SmsMessage();
             smsMessage.setChannelToken(channelToken);
             List<SmsMessage> selectSmsMsgList= smsMsgService.selectSmsMsgList(smsMessage);
@@ -118,6 +124,13 @@ public class WebSocketServer {
         }
 
     }
+
+
+
+
+
+
+
 
     /**
      *  错误信息
@@ -145,7 +158,9 @@ public class WebSocketServer {
         if (webSocketMap.containsKey(smsMessage.getChannelToken())){
             log.info("同步推送至前端{}",smsMessage);
             try{
-                String jsonStr = JSONObject.toJSONString( smsMessage );
+                List<SmsMessage> pushMsgList= new ArrayList<>();
+                pushMsgList.add(smsMessage);
+                String jsonStr = JSONObject.toJSONString( pushMsgList );
                 webSocketMap.get(smsMessage.getChannelToken()).sendMessage(jsonStr);
             } catch (IOException e) {
                 log.info("同步推至前端异常 {}",smsMessage);
@@ -188,4 +203,7 @@ public class WebSocketServer {
     public static synchronized void subOnlineCount() {
         WebSocketServer.onlineCount--;
     }
+
+
+
 }

@@ -182,7 +182,25 @@
 
   ws://<你的域名>:3001/getMsgList/<通道id>
 
-  请求获取信息时请发送一条内容为通道id的字符串，后端判断启动链接中的通道id和该字符串相等后，会返回相应内容。收到消息的格式类似于：
+  请求获取信息时请发送一条内容格式为json字符串的内容
+
+  ```
+  {
+    "channelToken": "fake_data",
+    "userToken": "fake_data",
+    "heartBeat": false
+  }
+  ```
+
+  heartBreat如果为true则单纯为心跳会返回发出的字符串，如果为false，则会去请求数据。
+
+  ，后端判断启动链接中的通道id和对应channeltoken相等后，会返回相应内容。
+
+  
+
+  
+
+  收到消息的格式类似于：
 
   ```
   [{"channelToken":"i4lnd649vinc5yqyvmomtkqu","content":"15536695887\n你好\n来自 红色白皮手机 卡： 卡哇伊 \n2021-07-22 13:03:45","createTime":1626973428000,"fromPlace":"15536695887","id":47,"sign":"5YwYJSmFUwzsNbOs1Cvu3w5qy7cT1jq6v0zEI5iquvI%3D","timestamp":1626930225000},{"channelToken":"i4lnd649vinc5yqyvmomtkqu","content":"test@2021-07-22 13:32:25","createTime":1626975148000,"fromPlace":"TranspondSms test","id":50,"sign":"RhzknGo0Py%2FPMlWExQVHm2Sn9EwEDJyp%2Bwa4qocSXq0%3D","timestamp":1626931945000},{"channelToken":"i4lnd649vinc5yqyvmomtkqu","content":"测试信息","createTime":1626975314000,"fromPlace":"15029968007","id":51,"sign":"E4vdGQQLLTCpWEhvYJFe038wOKm35TZBN46E9Ik5%2BTQ%3D","timestamp":1626769778000},{"channelToken":"i4lnd649vinc5yqyvmomtkqu","content":"测试信息","createTime":1626982739000,"fromPlace":"15029968007","id":53,"sign":"E4vdGQQLLTCpWEhvYJFe038wOKm35TZBN46E9Ik5%2BTQ%3D","timestamp":1626812978000}]
@@ -191,7 +209,7 @@
   如果在链接开启时收到手机推动的消息，那么会收到如下格式的内容：
 
   ```
-  {"channelToken":"i4lnd649vinc5yqyvmomtkqu","content":"test@2021-07-22 13:32:25","fromPlace":"TranspondSms test","id":50,"sign":"RhzknGo0Py%2FPMlWExQVHm2Sn9EwEDJyp%2Bwa4qocSXq0%3D","timestamp":1626931945000}
+  [{"channelToken":"i4lnd649vinc5yqyvmomtkqu","content":"test@2021-07-22 13:32:25","fromPlace":"TranspondSms test","id":50,"sign":"RhzknGo0Py%2FPMlWExQVHm2Sn9EwEDJyp%2Bwa4qocSXq0%3D","timestamp":1626931945000}]
   ```
 
 + 手机发送接口格式
@@ -221,7 +239,7 @@
   Post clearMsg
   {
   	"channelToken":",
-  	"id":""
+  	"id":12
   }
   ```
 

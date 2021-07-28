@@ -14,4 +14,6 @@ public class DelChannelVo {
      * 通道id
      */
     Integer id;
+
+    String token;
 }

@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.*;
  **/
 @Slf4j
 @RestController
+@CrossOrigin
 public class SmsUserController {
 
     SmsUserService smsUserService;
@@ -37,10 +38,6 @@ public class SmsUserController {
     public SmsUserController(SmsUserService smsUserService){
         this.smsUserService =smsUserService;
     }
-
-
-
-
 
 
 
@@ -222,6 +219,7 @@ public class SmsUserController {
             log.info("用户登录异常,使用的登录信息为 {}",loginRegisterVo);
             loginRegisterDto.setToken(Constants.WRONG_PASSWORD);
         }
+        loginRegisterDto.setSecretKey(null);
         return loginRegisterDto;
     }
 }

@@ -1,5 +1,6 @@
 package com.yzt.sms.controller;
 
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.yzt.sms.dto.AddChannelDto;
 import com.yzt.sms.dto.RespDto;
 import com.yzt.sms.entity.SmsChannel;
@@ -11,6 +12,8 @@ import com.yzt.sms.utils.HttpServletUtils;
 import com.yzt.sms.utils.TokenGeneration;
 import com.yzt.sms.vo.AddChannelVo;
 import com.yzt.sms.vo.DelChannelVo;
+import com.yzt.sms.vo.SmsUserTokenVo;
+import javassist.expr.NewArray;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +36,7 @@ import java.util.List;
  **/
 @Slf4j
 @RestController
+@CrossOrigin
 public class SmsChannelController {
 
     SmsUserService smsUserService;
@@ -41,6 +45,26 @@ public class SmsChannelController {
     public SmsChannelController(SmsUserService smsUserService,SmsChannelService smsChannelService){
         this.smsUserService = smsUserService;
         this.smsChannelService =smsChannelService;
+    }
+
+
+    /**
+     * 获得通道列表
+     * @author yin.zhengtao
+     * @date 15:25 2021/7/22
+     * @param
+     * @return RespDto<?>
+     **/
+    @PostMapping("getChannelList")
+    public RespDto<?> getChannelList(@Validated @RequestBody SmsUserTokenVo smsUserTokenVo){
+        SmsUserEntity smsUserEntity = new SmsUserEntity();
+        smsUserEntity.setToken(smsUserTokenVo.getUserToken());
+        smsUserEntity = smsUserService.selectSmsUser(smsUserEntity);
+        final SmsChannel smsChannel = new SmsChannel();
+        smsChannel.setUserId(smsUserEntity.getUserId());
+        log.info("查询该用户的channel {}",smsUserEntity);
+        List<SmsChannel> smsChannelList = smsChannelService.selectChannelList(smsChannel);
+        return new RespDto<>(RespCode.SUCCESS,smsChannelList);
     }
 
 
@@ -62,6 +86,7 @@ public class SmsChannelController {
     }
 
 
+
     /**
      * 删除通道
      * @author yin.ZT
@@ -72,7 +97,7 @@ public class SmsChannelController {
     @PostMapping("delChannel")
     public RespDto<?> delChannel(@Validated @RequestBody DelChannelVo delChannelVo){
         Integer id = delChannelVo.getId();
-        SmsUserEntity smsUserEntity = judgeSmsUserExit();
+        SmsUserEntity smsUserEntity = judgeSmsUserExit(delChannelVo.getToken());
         if (null == smsUserEntity){
             return new RespDto<>(RespCode.TOKEN_NONEXISTENT);
         }
@@ -111,7 +136,7 @@ public class SmsChannelController {
      **/
     @PostMapping("addChannel")
     public RespDto<AddChannelDto> addChannel(@Validated @RequestBody AddChannelVo addChannelVo){
-        SmsUserEntity smsUserEntity = judgeSmsUserExit();
+        SmsUserEntity smsUserEntity = judgeSmsUserExit(addChannelVo.getToken());
         if (null == smsUserEntity){
             log.info("token不存在 {}",addChannelVo);
             return new RespDto<>(RespCode.TOKEN_NONEXISTENT);
@@ -141,6 +166,19 @@ public class SmsChannelController {
 
     protected SmsUserEntity judgeSmsUserExit(){
         final String token = HttpServletUtils.getRequestHeader("token");
+        final SmsUserEntity smsUserEntity = new SmsUserEntity();
+        smsUserEntity.setToken(token);
+        log.info("查询token为{}的用户。",token);
+        final SmsUserEntity smsUserEntity1 = smsUserService.selectSmsUser(smsUserEntity);
+        log.info("查询到的token用户为{}",smsUserEntity1);
+        return smsUserEntity1;
+    }
+
+
+    protected SmsUserEntity judgeSmsUserExit(String token){
+        if (StringUtils.isBlank(token)){
+            return judgeSmsUserExit();
+        }
         final SmsUserEntity smsUserEntity = new SmsUserEntity();
         smsUserEntity.setToken(token);
         log.info("查询token为{}的用户。",token);

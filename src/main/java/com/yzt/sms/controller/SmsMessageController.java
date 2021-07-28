@@ -10,10 +10,10 @@ import com.yzt.sms.service.SmsChannelService;
 import com.yzt.sms.service.SmsMsgService;
 import com.yzt.sms.utils.DesUtils;
 import com.yzt.sms.utils.TimeUtils;
+import com.yzt.sms.vo.ClearMsgVo;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -33,6 +33,7 @@ import java.util.Date;
  **/
 @Slf4j
 @RestController
+@CrossOrigin
 public class SmsMessageController {
 
 
@@ -52,10 +53,11 @@ public class SmsMessageController {
 
 //    clearMsg
 @PostMapping("clearMsg")
-public RespDto<?> clearMsg(String channelToken,Long id){
+public RespDto<?> clearMsg(@Validated @RequestBody ClearMsgVo clearMsgVo){
+
     SmsMessage smsMessage = new SmsMessage();
-    smsMessage.setChannelToken(channelToken);
-    smsMessage.setId(id);
+    smsMessage.setChannelToken(clearMsgVo.getChannelToken());
+    smsMessage.setId(clearMsgVo.getId());
     int i = smsMsgService.deleteSmsMsgList(smsMessage);
     return new RespDto<>(RespCode.SUCCESS,i);
 }

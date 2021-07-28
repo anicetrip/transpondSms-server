@@ -23,4 +23,7 @@ public class AddChannelVo implements Serializable {
      * 通道加密密码
      */
     private String channelEncryptionKey;
+
+
+    private String token;
 }
