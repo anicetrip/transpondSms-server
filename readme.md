@@ -158,9 +158,9 @@
 
 | 方法+方法信息                                                | 传参                                                         | 返回值                                                       |
 | ------------------------------------------------------------ | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| Get getChannelList获得通道列表                               | 请求头中的token                                              | 一个大大的list！                                             |
-| Post delChannel 删除通道<br/>传参为通道id                    | {<br/>  "id": 65<br/>}                                       |                                                              |
-| Post addChannel新增通道<br/>如果不使用通道加密密钥的话请不要传参给后端。 | {<br/>  "channelName": "fake_data",<br/>  "channelEncryptionKey": "fake_data"<br/>} | {<br/>  "channelToken": "fake_data",<br/>  "channelName": "fake_data",<br/>  "channelEncryptionKey": "fake_data"<br/>} |
+| Post  getChannelList获得通道列表                             | {<br/>  "userToken": "fake_data"<br/>}                       | 一个大大的list！                                             |
+| Post delChannel 删除通道<br/>传参为通道id                    | {<br/>  "id": 7,<br/>  "token": "fake_data"<br/>}            |                                                              |
+| Post addChannel新增通道<br/>如果不使用通道加密密钥的话请不要传参给后端。 | {<br/>  "channelName": "fake_data",<br/>  "channelEncryptionKey": "fake_data",<br/>  "token": "fake_data"<br/>} | {<br/>  "channelToken": "fake_data",<br/>  "channelName": "fake_data",<br/>  "channelEncryptionKey": "fake_data"<br/>} |
 
 ## 短信表
 
